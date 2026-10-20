@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History of Personal Computers (1975 - Present)</title>
+  <style>
+    /* =========================================================
+       ERA STYLES & COLOR SCHEMES
+       ========================================================= */
+    :root {
+      --bg: #1c130c;
+      --card-bg: rgba(43, 29, 18, 0.88);
+      --border: #d97706;
+      --text: #fef3c7;
+      --accent: #f59e0b;
+      --font: 'Courier New', Courier, monospace;
+      --track-color: #854d0e;
+      --title-shadow: 2px 2px 0px #78350f;
+    }
+
+    body.era-wildwest {
+      --bg: #1a0f07;
+      --card-bg: rgba(35, 20, 10, 0.9);
+      --border: #d97706;
+      --text: #fef3c7;
+      --accent: #f59e0b;
+      --font: 'Courier New', Courier, monospace;
+      --track-color: #78350f;
+      --title-shadow: 2px 2px 0px #451a03;
+    }
+
+    body.era-retro {
+      --bg: #090d16;
+      --card-bg: rgba(15, 23, 42, 0.9);
+      --border: #ec4899;
+      --text: #06b6d4;
+      --accent: #f43f5e;
+      --font: 'Trebuchet MS', sans-serif;
+      --track-color: #a855f7;
+      --title-shadow: 0 0 10px #ec4899;
+    }
+
+    body.era-future {
+      --bg: #020617;
+      --card-bg: rgba(15, 23, 42, 0.85);
+      --border: #38bdf8;
+      --text: #e0f2fe;
+      --accent: #818cf8;
+      --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      --track-color: #0284c7;
+      --title-shadow: 0 0 15px #38bdf8;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      height: 100vh;
+      overflow: hidden;
+      transition: background-color 0.8s ease, color 0.8s ease;
+      user-select: none;
+    }
+
+    /* Scanline effect for retro/arcade feel */
+    .scanlines {
+      position: fixed;
+      top:0; left:0; width:100vw; height:100vh;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      z-index: 99;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* =========================================================
+       ARCADE HUD
+       ========================================================= */
+    #hud {
+      position: fixed;
+      top: 15px; right: 20px; left: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px 20px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      z-index: 20;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+
+    .hud-group { display: flex; gap: 20px; font-weight: bold; font-size: 0.95rem; }
+    .hud-val { color: var(--accent); }
+
+    /* =========================================================
+       SLIDE DISPLAY
+       ========================================================= */
+    .slide-wrapper {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 80px 20px 100px 20px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 3px solid var(--border);
+      border-radius: 16px;
+      padding: 35px;
+      max-width: 850px;
+      width: 90%;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.7);
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.8s ease;
+      position: relative;
+    }
+
+    .card:hover {
+      transform: translateY(-5px) scale(1.01);
+      box-shadow: 0 18px 45px var(--border);
+    }
+
+    .era-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--border);
+      color: #000;
+      font-weight: bold;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      color: var(--text);
+      text-shadow: var(--title-shadow);
+      margin-bottom: 15px;
+    }
+
+    p {
+      font-size: 1.15rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .specs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      background: rgba(0,0,0,0.3);
+      padding: 15px;
+      border-radius: 8px;
+      border: 1px dashed var(--border);
+    }
+
+    .spec-item { font-size: 0.95rem; }
+    .spec-label { font-weight: bold; color: var(--accent); display: block; }
+
+    /* =========================================================
+       NAVIGATION CONTROLS
+       ========================================================= */
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+      justify-content: center;
+    }
+
+    button {
+      background: var(--border);
+      color: #000;
+      border: none;
+      padding: 12px 24px;
+      font-weight: bold;
+      font-size: 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 0.1s, filter 0.2s;
+      font-family: inherit;
+    }
+
+    button:hover { filter: brightness(1.2); transform: translateY(-2px); }
+    button:active { transform: translateY(1px); }
+
+    /* =========================================================
+       TRAIN & TRACKS ANIMATION
+       ========================================================= */
+    .track-wrapper {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100vw;
+      height: 70px;
+      z-index: 10;
+      overflow: hidden;
+    }
+
+    .railroad {
+      position: absolute;
+      bottom: 15px;
+      width: 100%;
+      height: 6px;
+      background: var(--track-color);
+      box-shadow: 0 0 10px var(--track-color);
+    }
+
+    .railroad::before {
+      content: '';
+      position: absolute;
+      top: -6px; left: 0; width: 100%; height: 18px;
+      background: repeating-linear-gradient(90deg, var(--track-color) 0 4px, transparent 4px 20px);
+    }
+
+    .train-vehicle {
+      position: absolute;
+      bottom: 18px;
+      left: -200px;
+      font-size: 2.8rem;
+      white-space: nowrap;
+      cursor: pointer;
+      animation: trainDrive 9s linear infinite;
+      filter: drop-shadow(0 0 8px var(--accent));
+    }
+
+    @keyframes trainDrive {
+      0% { left: -200px; }
+      100% { left: 105vw; }
+    }
+
+    /* =========================================================
+       GAME TARGETS & POPUPS
+       ========================================================= */
+    .bug-target {
+      position: fixed;
+      font-size: 2.2rem;
+      cursor: pointer;
+      z-index: 15;
+      animation: float 2.5s ease-in-out infinite alternate;
+      filter: drop-shadow(0 0 10px var(--accent));
+    }
+
+    @keyframes float {
+      from { transform: translateY(0px) rotate(0deg); }
+      to { transform: translateY(-20px) rotate(10deg); }
+    }
+
+    .score-popup {
+      position: fixed;
+      color: #34d399;
+      font-weight: bold;
+      font-size: 1.8rem;
+      pointer-events: none;
+      z-index: 30;
+      animation: popup 0.8s ease-out forwards;
+      text-shadow: 0 0 8px #000;
+    }
+
+    @keyframes popup {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-50px) scale(1.4); }
+    }
+
+    .particle {
+      position: fixed;
+      width: 8px; height: 8px;
+      background: var(--accent);
+      pointer-events: none;
+      z-index: 25;
+      border-radius: 50%;
+      animation: explode 0.5s ease-out forwards;
+    }
+
+    @keyframes explode {
+      0% { opacity: 1; transform: translate(0, 0); }
+      100% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
+    }
+  </style>
+</head>
+<body class="era-wildwest">
+
+  <div class="scanlines"></div>
+
+  <!-- ARCADE HUD -->
+  <div id="hud">
+    <div class="hud-group">
+      <span>ERA: <span id="hud-era" class="hud-val">1970s PIONEERS</span></span>
+      <span>SLIDE: <span id="hud-slide" class="hud-val">1 / 15</span></span>
+    </div>
+    <div class="hud-group">
+      <span>CPU SPEED: <span id="hud-cpu" class="hud-val">2.0 MHz</span></span>
+      <span>SCORE: <span id="hud-score" class="hud-val">0</span></span>
+      <span>SOUND: <span id="hud-sound" class="hud-val" style="cursor:pointer;">🔊 ON</span></span>
+    </div>
+  </div>
+
+  <!-- SLIDE CONTAINER -->
+  <div class="slide-wrapper">
+    <div class="card" id="slide-card">
+      <span class="era-badge" id="slide-badge">WILD WEST PIONEERS</span>
+      <h1 id="slide-title">Loading Slide...</h1>
+      <p id="slide-desc">Slide description content...</p>
+
+      <div class="specs-grid">
+        <div class="spec-item"><span class="spec-label">COMPANY</span><span id="spec-company">-</span></div>
+        <div class="spec-item"><span class="spec-label">YEAR</span><span id="spec-year">-</span></div>
+        <div class="spec-item"><span class="spec-label">CPU SPEED</span><span id="spec-speed">-</span></div>
+        <div class="spec-item"><span class="spec-label">STORAGE / RAM</span><span id="spec-storage">-</span></div>
+      </div>
+
+      <div class="controls">
+        <button id="prev-btn">⬅️ PREV</button>
+        <button id="next-btn">NEXT ➡️</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FLOATING GAME BUG -->
+  <div class="bug-target" id="bug">👾</div>
+
+  <!-- ANIMATED TRAIN & TRACKS -->
+  <div class="track-wrapper">
+    <div class="railroad"></div>
+    <div class="train-vehicle" id="train">🚂💨</div>
+  </div>
+
+  <script>
+    // =========================================================
+    // COMPLETE 15-SLIDE DATABASE
+    // =========================================================
+    const slidesData = [
+      {
+        eraClass: "era-wildwest",
+        eraBadge: "🤠 1970s Wild West Era",
+        title: "1. Altair 8800 (1975)",
+        desc: "The spark that started the personal computer revolution! Sold as a DIY build-it-yourself kit through Popular Electronics magazine. It had no keyboard or screen—users flipped switches on the front panel to enter code.",
+        company: "MITS",
+        year: "1975",
+        speed: "2.0 MHz (Intel 8080)",
+        storage: "256 Bytes RAM",
+        train: "🚂💨",
+        cpuDisplay: "2.0 MHz"
+      },
+      {
+        eraClass: "era-wildwest",
+        eraBadge: "🤠 1970s Wild West Era",
+        title: "2. Apple II (1977)",
+        desc: "Designed by Steve Wozniak, the Apple II was one of the first highly successful mass-produced microcomputers. It featured color graphics, expansion slots, and supported 5.25-inch floppy disk drives.",
+        company: "Apple Computer",
+        year: "1977",
+        speed: "1.0 MHz (MOS 6502)",
+        storage: "4 KB RAM / Floppy Disks",
+        train: "🚂💨",
+        cpuDisplay: "1.0 MHz"
+      },
+      {
+        eraClass: "era-wildwest",
+        eraBadge: "🤠 1970s Wild West Era",
+        title: "3. Commodore PET & TRS-80 (1977)",
+        desc: "Along with Apple II, these formed the '1977 Trinity'. The Commodore PET had an all-in-one built-in monitor and cassette tape drive, making computing accessible to schools and homes.",
+        company: "Commodore / Tandy",
+        year: "1977",
+        speed: "1.0 MHz - 1.77 MHz",
+        storage: "4 KB RAM / Cassette Tape",
+        train: "🚂💨",
+        cpuDisplay: "1.77 MHz"
+      },
+      {
+        eraClass: "era-wildwest",
+        eraBadge: "🤠 1970s Wild West Era",
+        title: "4. IBM PC 5150 (1981)",
+        desc: "The machine that legitimized personal computers for business! Its open architecture created the 'IBM PC Compatible' standard that dominated the industry and established MS-DOS as the primary OS.",
+        company: "IBM",
+        year: "1981",
+        speed: "4.77 MHz (Intel 8088)",
+        storage: "16 KB RAM / Dual Floppies",
+        train: "🚂💨",
+        cpuDisplay: "4.77 MHz"
+      },
+      {
+        eraClass: "era-retro",
+        eraBadge: "🕹️ 80s & 90s Retro Era",
+        title: "5. Commodore 64 (1982)",
+        desc: "The best-selling single computer model of all time! Famous for its legendary SID sound chip and dedicated graphics chip, making it an absolute home gaming juggernaut.",
+        company: "Commodore",
+        year: "1982",
+        speed: "1.02 MHz (MOS 6510)",
+        storage: "64 KB RAM / Floppy or Tape",
+        train: "🚆⚡",
+        cpuDisplay: "1.02 MHz"
+      },
+      {
+        eraClass: "era-retro",
+        eraBadge: "🕹️ 80s & 90s Retro Era",
+        title: "6. Apple Macintosh 128K (1984)",
+        desc: "Revolutionized personal computing by bringing the Graphical User Interface (GUI), desktop icons, windows, and a mouse into the mainstream consumer market.",
+        company: "Apple Computer",
+        year: "1984",
+        speed: "7.83 MHz (Motorola 68000)",
+        storage: "128 KB RAM / 400 KB Floppy",
+        train: "🚆⚡",
+        cpuDisplay: "7.83 MHz"
+      },
+      {
+        eraClass: "era-retro",
+        eraBadge: "🕹️ 80s & 90s Retro Era",
+        title: "7. Commodore Amiga 1000 (1985)",
+        desc: "Ahead of its time with custom coprocessors delivering pre-emptive multitasking, 4096-color graphics, and stereo sound. A staple for 3D graphics and video production.",
+        company: "Commodore",
+        year: "1985",
+        speed: "7.09 MHz (Motorola 68000)",
+        storage: "256 KB RAM / 880 KB Floppy",
+        train: "🚆⚡",
+        cpuDisplay: "7.09 MHz"
+      },
+      {
+        eraClass: "era-retro",
+        eraBadge: "🕹️ 80s & 90s Retro Era",
+        title: "8. The 386/486 PC & Turbo Button (1988-1992)",
+        desc: "32-bit computing arrived with Intel 386/486 chips! PCs featured physical 'Turbo' buttons on the case to underclock the CPU so older DOS games wouldn't run too fast.",
+        company: "Intel / Various PC Builders",
+        year: "1988 - 1992",
+        speed: "16 MHz - 66 MHz",
+        storage: "2 MB to 16 MB RAM / 100 MB HDD",
+        train: "🚆⚡",
+        cpuDisplay: "66.0 MHz"
+      },
+      {
+        eraClass: "era-retro",
+        eraBadge: "🕹️ 80s & 90s Retro Era",
+        title: "9. Windows 3.0 & Sound Cards (1990)",
+        desc: "Windows 3.0 brought mass success to Microsoft Windows. Sound cards like Sound Blaster gave PCs realistic sound synthesis and digitized CD-quality music.",
+        company: "Microsoft / Creative Labs",
+        year: "1990",
+        speed: "25 MHz - 33 MHz",
+        storage: "4 MB RAM / CD-ROM Drives",
+        train: "🚆⚡",
+        cpuDisplay: "33.0 MHz"
+      },
+      {
+        eraClass: "era-retro",
+        eraBadge: "🕹️ 80s & 90s Retro Era",
+        title: "10. Windows 95 & Dial-Up Internet (1995)",
+        desc: "A massive cultural event introducing the Start Button, Taskbar, and plug-and-play. Paired with dial-up modems, millions connected to the World Wide Web for the first time.",
+        company: "Microsoft",
+        year: "1995",
+        speed: "90 MHz - 133 MHz (Pentium)",
+        storage: "16 MB RAM / 1.2 GB Hard Drive",
+        train: "🚆⚡",
+        cpuDisplay: "133 MHz"
+      },
+      {
+        eraClass: "era-retro",
+        eraBadge: "🕹️ 80s & 90s Retro Era",
+        title: "11. Apple iMac G3 (1998)",
+        desc: "The translucent, candy-colored all-in-one computer that saved Apple. It killed off the traditional floppy drive in favor of USB standard ports and built-in ethernet.",
+        company: "Apple",
+        year: "1998",
+        speed: "233 MHz - 700 MHz (PowerPC G3)",
+        storage: "32 MB RAM / 4 GB HDD / CD-ROM",
+        train: "🚆⚡",
+        cpuDisplay: "233 MHz"
+      },
+      {
+        eraClass: "era-future",
+        eraBadge: "🚀 Modern & Future Era",
+        title: "12. Windows XP & Gigahertz Era (2001)",
+        desc: "Personal computing broke the 1.0 GHz clock speed barrier! Windows XP merged consumer and business OS lines into a stable platform with iconic blue taskbars and wallpapers.",
+        company: "Microsoft / Intel / AMD",
+        year: "2001",
+        speed: "1.0 GHz - 2.4 GHz (Pentium 4)",
+        storage: "128 MB RAM / 40 GB HDD",
+        train: "🚝✨",
+        cpuDisplay: "1.5 GHz"
+      },
+      {
+        eraClass: "era-future",
+        eraBadge: "🚀 Modern & Future Era",
+        title: "13. Laptops & Ultrabooks Rule (2008-2015)",
+        desc: "Laptop sales officially surpassed desktop PCs for the first time worldwide. Solid State Drives (SSDs) replaced spinning hard drives, boosting boot speeds from minutes to seconds.",
+        company: "Various (Intel / Apple / Dell)",
+        year: "2008 - 2015",
+        speed: "2.5 GHz (Intel Core i7)",
+        storage: "8 GB RAM / 256 GB SSD",
+        train: "🚝✨",
+        cpuDisplay: "2.8 GHz"
+      },
+      {
+        eraClass: "era-future",
+        eraBadge: "🚀 Modern & Future Era",
+        title: "14. Apple Silicon ARM Revolution (2020)",
+        desc: "Apple shifted from x86 Intel CPUs to custom ARM-based system-on-chips (M1). It redefined performance-per-watt, providing multi-day battery life and fanless thin designs.",
+        company: "Apple",
+        year: "2020",
+        speed: "3.2 GHz (Apple M1 8-Core)",
+        storage: "16 GB Unified Memory / 512 GB SSD",
+        train: "🚝✨",
+        cpuDisplay: "3.2 GHz"
+      },
+      {
+        eraClass: "era-future",
+        eraBadge: "🚀 Modern & Future Era",
+        title: "15. Copilot+ AI PCs & Quantum Horizon (2024 - 2026+)",
+        desc: "Modern PCs are equipped with Neural Processing Units (NPUs) running local Large Language Models (LLMs) at 45+ TOPS. The future blends local AI assistants with quantum computing.",
+        company: "Microsoft / Qualcomm / Intel / AMD",
+        year: "2024 - 2026+",
+        speed: "4.5 GHz+ CPU + 45+ TOPS NPU",
+        storage: "32 GB RAM / 2 TB NVMe SSD",
+        train: "🚝✨",
+        cpuDisplay: "5.0 GHz"
+      }
+    ];
+
+    // =========================================================
+    // STATE & SYNTHESIZER
+    // =========================================================
+    let currentSlide = 0;
+    let score = 0;
+    let soundEnabled = true;
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(freq, type = 'square', duration = 0.1) {
+      if (!soundEnabled) return;
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      
+      osc.start();
+      osc.stop(audioCtx.currentTime + duration);
+    }
+
+    // =========================================================
+    // RENDER SLIDE CONTENT
+    // =========================================================
+    function renderSlide(index) {
+      const data = slidesData[index];
+      
+      document.body.className = data.eraClass;
+      document.getElementById('hud-era').textContent = data.eraBadge.replace(/[^a-zA-Z0-9\s]/g, '').trim();
+      document.getElementById('hud-slide').textContent = `${index + 1} / ${slidesData.length}`;
+      document.getElementById('hud-cpu').textContent = data.cpuDisplay;
+
+      document.getElementById('slide-badge').textContent = data.eraBadge;
+      document.getElementById('slide-title').textContent = data.title;
+      document.getElementById('slide-desc').textContent = data.desc;
+      document.getElementById('spec-company').textContent = data.company;
+      document.getElementById('spec-year').textContent = data.year;
+      document.getElementById('spec-speed').textContent = data.speed;
+      document.getElementById('spec-storage').textContent = data.storage;
+
+      const trainEl = document.getElementById('train');
+      trainEl.textContent = data.train;
+
+      // Accelerate train according to era speed
+      if (data.eraClass === 'era-wildwest') trainEl.style.animationDuration = '10s';
+      if (data.eraClass === 'era-retro') trainEl.style.animationDuration = '6s';
+      if (data.eraClass === 'era-future') trainEl.style.animationDuration = '3s';
+    }
+
+    // =========================================================
+    // GAME & INTERACTION LOGIC
+    // =========================================================
+    const bug = document.getElementById('bug');
+    bug.addEventListener('click', (e) => {
+      score += 500;
+      document.getElementById('hud-score').textContent = score;
+      playSound(880, 'sine', 0.15);
+
+      // Score Pop-up
+      const popup = document.createElement('div');
+      popup.className = 'score-popup';
+      popup.textContent = '+500';
+      popup.style.left = e.clientX + 'px';
+      popup.style.top = e.clientY + 'px';
+      document.body.appendChild(popup);
+      setTimeout(() => popup.remove(), 800);
+
+      // Particle Burst
+      for (let i = 0; i < 8; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = e.clientX + 'px';
+        p.style.top = e.clientY + 'px';
+        const dx = (Math.random() - 0.5) * 120 + 'px';
+        const dy = (Math.random() - 0.5) * 120 + 'px';
+        p.style.setProperty('--dx', dx);
+        p.style.setProperty('--dy', dy);
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 500);
+      }
+
+      // Move Bug to Random Position
+      bug.style.top = Math.floor(Math.random() * 50 + 25) + '%';
+      bug.style.left = Math.floor(Math.random() * 70 + 15) + '%';
+    });
+
+    document.getElementById('train').addEventListener('click', () => {
+      playSound(220, 'sawtooth', 0.4);
+      const train = document.getElementById('train');
+      train.style.animationDuration = '1.5s';
+      setTimeout(() => renderSlide(currentSlide), 2000);
+    });
+
+    // Navigation Buttons
+    document.getElementById('next-btn').addEventListener('click', () => {
+      currentSlide = (currentSlide + 1) % slidesData.length;
+      playSound(600, 'triangle', 0.08);
+      renderSlide(currentSlide);
+    });
+
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      currentSlide = (currentSlide - 1 + slidesData.length) % slidesData.length;
+      playSound(400, 'triangle', 0.08);
+      renderSlide(currentSlide);
+    });
+
+    // Keyboard Arrow Controls
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ') {
+        document.getElementById('next-btn').click();
+      } else if (e.key === 'ArrowLeft') {
+        document.getElementById('prev-btn').click();
+      }
+    });
+
+    // Audio Toggle
+    document.getElementById('hud-sound').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById('hud-sound').textContent = soundEnabled ? '🔊 ON' : '🔇 OFF';
+    });
+
+    // Initial Render
+    renderSlide(0);
+  </script>
+</body>
+</html>
